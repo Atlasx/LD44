@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using Weapons;
 
+[RequireComponent (typeof(Rigidbody2D))]
+[RequireComponent (typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float MoveSpeed = 1f;
     public float Drag = 0.95f;
+    public float SleepSpeed = 0.1f;
 
     [Header("Control Settings")]
     public KeyCode leftKey = KeyCode.A;
@@ -27,10 +30,15 @@ public class PlayerController : MonoBehaviour
 
     public Weapon activeWeapon;
 
+    private Collider2D collider;
+    private Rigidbody2D rigidbody;
+
     public void Start()
     {
         velocity = Vector2.zero;
         activeWeapon = new Weapon();
+        collider = GetComponent<BoxCollider2D>();
+        rigidbody = GetComponent<Rigidbody2D>();
     }
 
     public void Update()
@@ -121,12 +129,21 @@ public class PlayerController : MonoBehaviour
 
         // Update player velocity
         velocity += desiredMove;
-        velocity *= Drag;
+        if (velocity.sqrMagnitude > SleepSpeed)
+        {
+            velocity *= Drag;
+        }
+        else
+        {
+            velocity = Vector2.zero;
+        }
 
-        Vector2 delta = velocity * Time.deltaTime;
+        rigidbody.velocity = velocity;
+
+        //Vector2 delta = velocity * Time.deltaTime;
 
         // Apply velocity to player
-        transform.position += To3DVector(delta);
+        //transform.position += To3DVector(delta);
     }
 
     private static Vector3 To3DVector(Vector2 vec)

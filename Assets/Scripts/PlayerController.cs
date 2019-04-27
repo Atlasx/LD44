@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     public float MoveSpeed = 1f;
     public float Drag = 0.95f;
     public float SleepSpeed = 0.1f;
+    public float MaxMoveSpeed = 5f;
 
     [Header("Control Settings")]
     public KeyCode leftKey = KeyCode.A;
@@ -32,6 +33,7 @@ public class PlayerController : MonoBehaviour
 
     private Collider2D collider;
     private Rigidbody2D rigidbody;
+    private Animator anim;
 
     public void Start()
     {
@@ -39,12 +41,26 @@ public class PlayerController : MonoBehaviour
         activeWeapon = new Weapon();
         collider = GetComponent<BoxCollider2D>();
         rigidbody = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
     }
 
     public void Update()
     {
-        MovementUpdate();
         WeaponUpdate();
+        AnimatorUpdate();
+    }
+
+    public void FixedUpdate()
+    {
+        MovementUpdate();
+    }
+
+    private void AnimatorUpdate()
+    {
+        // Update movement parameters
+        anim.SetFloat("MoveX", velocity.normalized.x);
+        anim.SetFloat("MoveY", velocity.normalized.y);
+        anim.SetBool("Idle", velocity.sqrMagnitude < SleepSpeed);    
     }
 
     private void WeaponUpdate()

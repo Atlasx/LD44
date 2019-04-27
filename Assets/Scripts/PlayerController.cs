@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour
     private Collider2D collider;
     private Rigidbody2D rigidbody;
     private Animator anim;
+    private Health pHealth;
 
     public void Start()
     {
@@ -42,6 +43,7 @@ public class PlayerController : MonoBehaviour
         collider = GetComponent<BoxCollider2D>();
         rigidbody = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+        pHealth = GetComponent<Health>();
     }
 
     public void Update()
@@ -58,8 +60,8 @@ public class PlayerController : MonoBehaviour
     private void AnimatorUpdate()
     {
         // Update movement parameters
-        anim.SetFloat("MoveX", velocity.normalized.x);
-        anim.SetFloat("MoveY", velocity.normalized.y);
+        anim.SetFloat("MoveX", velocity.x);
+        anim.SetFloat("MoveY", velocity.y);
         anim.SetBool("Idle", velocity.sqrMagnitude < SleepSpeed);    
     }
 
@@ -97,9 +99,10 @@ public class PlayerController : MonoBehaviour
         }
 
         // Using weapons
-        if (Input.GetKey(attackKey))
+        if (Input.GetKeyDown(attackKey))
         {
             activeWeapon.Use();
+            pHealth.Harm(1);
         }
 
         // Discarding weapons
@@ -144,7 +147,7 @@ public class PlayerController : MonoBehaviour
         desiredMove *= MoveSpeed;
 
         // Update player velocity
-        velocity += desiredMove;
+        velocity += desiredMove * Time.deltaTime;
         if (velocity.sqrMagnitude > SleepSpeed)
         {
             velocity *= Drag;

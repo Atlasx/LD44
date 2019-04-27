@@ -50,7 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TrackTarget: {fileID: 0}
-  Offset: {x: 0, y: 1.8, z: 0}
+  Offset: {x: 0, y: 1.6, z: 0}
 --- !u!114 &479297524890847820
 MonoBehaviour:
   m_ObjectHideFlags: 0

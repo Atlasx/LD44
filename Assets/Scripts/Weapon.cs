@@ -4,30 +4,17 @@ using UnityEngine;
 
 namespace Weapons
 {
-    public class Weapon
+    [RequireComponent(typeof(Animator))]
+    public class Weapon : MonoBehaviour
     {
-        public GameObject gameObject;
-
-        public WeaponType type;
+        public WeaponType type = WeaponType.None;
+        public Animator anim;
         public float cooldownTime;
         public float powerupTime;
+        public float actionDuration;
+        public int damageDealt;
 
-        public Weapon()
-        {
-            type = WeaponType.None;
-        }
-
-        public virtual void Use()
-        {
-            Debug.Log("Base Weapon Use");
-        }
-
-        public virtual void Discard()
-        {
-            if (gameObject != null)
-            {
-                Object.Destroy(gameObject);
-            }
-        }
+        public virtual void Use() {}
+        public virtual void Discard() {}
     }
 }

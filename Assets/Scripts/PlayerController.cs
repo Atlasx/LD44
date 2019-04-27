@@ -39,7 +39,6 @@ public class PlayerController : MonoBehaviour
     public void Start()
     {
         velocity = Vector2.zero;
-        activeWeapon = new Weapon();
         collider = GetComponent<BoxCollider2D>();
         rigidbody = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
@@ -102,7 +101,6 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(attackKey))
         {
             activeWeapon.Use();
-            pHealth.Harm(1);
         }
 
         // Discarding weapons

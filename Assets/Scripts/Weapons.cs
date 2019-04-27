@@ -13,24 +13,6 @@ namespace Weapons
         Crossbow
     }
 
-    public class Sword : Weapon
-    {
-        public Sword()
-        {
-            type = WeaponType.Sword;
-        }
-
-        public override void Use()
-        {
-            Debug.Log("Using a sword");
-        }
-
-        public override void Discard()
-        {
-            base.Discard();
-        }
-    }
-
     public class Crossbow : Weapon
     {
         public Crossbow()

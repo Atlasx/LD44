@@ -21,7 +21,6 @@ public class HealthUI : MonoBehaviour
         int emptyHearts = hp > 0 ? (maxHp - hp) / 2 : maxHp / 2;
 
         int numHearts = (maxHp / 2);
-        Debug.Log(numHearts);
         float currentPos = -(numHearts * heartWidth + (numHearts - 1) * heartPadding) * 0.5f;
 
         // Clear old hearts

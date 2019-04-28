@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Health : MonoBehaviour
 {
@@ -25,6 +26,18 @@ public class Health : MonoBehaviour
 
     private float invcTimer = 0f;
 
+    private Dictionary<int, UnityAction> listeners = new Dictionary<int, UnityAction>();
+
+    public void Subscribe(int id, UnityAction callback)
+    {
+        listeners.Add(id, callback);
+    }
+
+    public bool Unsubscribe(int id)
+    {
+        return listeners.Remove(id);
+    }
+
     // Hurts the entity
     public void Harm(int hp)
     {
@@ -44,6 +57,12 @@ public class Health : MonoBehaviour
             invcTimer = InvincibilityDuration;
 
             SpawnBlood();
+
+            // Send message to listeners
+            foreach (UnityAction ac in listeners.Values)
+            {
+                ac.Invoke();
+            }
         }
     }
 

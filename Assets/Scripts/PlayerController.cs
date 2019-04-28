@@ -1,18 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Weapons;
 
 [RequireComponent (typeof(Rigidbody2D))]
 [RequireComponent (typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
+    public bool DebugMovement = false;
+
+    [Header("Component References")]
+    public Animator anim;
+
     [Header("Movement Settings")]
     public float MoveSpeed = 1f;
     public float Drag = 0.95f;
     public float SleepSpeed = 0.1f;
     public float MaxMoveSpeed = 5f;
     public float CrouchMoveSpeed = 30f;
+    public float InternalGravity = 9.81f;
+    public float DamagedBounceHeight = 0.5f;
 
     [Header("Control Settings")]
     public KeyCode leftKey = KeyCode.A;
@@ -30,23 +38,38 @@ public class PlayerController : MonoBehaviour
 
     [HideInInspector]
     public Vector2 velocity;
+    private Vector2 internalVelocity;
+    private bool internalRest = true;
     private float currentMoveSpeed;
     private bool crouching = false;
 
     public Weapon activeWeapon;
 
-    private Collider2D collider;
-    private Rigidbody2D rigidbody;
-    private Animator anim;
+    private Collider2D col;
+    private Rigidbody2D rb;
     private Health pHealth;
+
+    private GameObject childSprite;
 
     public void Start()
     {
         velocity = Vector2.zero;
-        collider = GetComponent<BoxCollider2D>();
-        rigidbody = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
+        internalVelocity = Vector2.zero;
+        col = GetComponent<BoxCollider2D>();
+        rb = GetComponent<Rigidbody2D>();
         pHealth = GetComponent<Health>();
+        childSprite = transform.GetChild(0)?.gameObject;
+
+        // Subscribe to our health messages
+        UnityAction healthAction = HealthAction;
+        pHealth.Subscribe(GetInstanceID(), healthAction);
+    }
+
+    public void HealthAction()
+    {
+        Debug.Log("Logged a health action");
+        internalRest = false;
+        internalVelocity += Vector2.up * Mathf.Sqrt(2f * InternalGravity * DamagedBounceHeight);
     }
 
     public void Update()
@@ -58,6 +81,14 @@ public class PlayerController : MonoBehaviour
     public void FixedUpdate()
     {
         MovementUpdate();
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (DebugMovement)
+        {
+            Gizmos.DrawLine(transform.position, transform.position + new Vector3(internalVelocity.x, internalVelocity.y, 0f));
+        }
     }
 
     private void AnimatorUpdate()
@@ -114,6 +145,7 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(discardKey))
         {
             activeWeapon.Discard();
+            pHealth.Harm(1);
         }
     }
 
@@ -171,12 +203,29 @@ public class PlayerController : MonoBehaviour
             velocity = Vector2.zero;
         }
 
-        rigidbody.velocity = velocity;
+        rb.velocity = velocity;
 
-        //Vector2 delta = velocity * Time.deltaTime;
+        // Update internal child velocity
+        if (!internalRest)
+        {
+            if (childSprite.transform.localPosition.y < 0f)
+            {
+                internalVelocity = Vector2.zero;
+                childSprite.transform.localPosition = Vector3.zero;
+                internalRest = true;
+            }
+            else
+            {
+                // only add gravity if we need it
+                internalVelocity += InternalGravity * Vector2.down * Time.deltaTime;
+            }
 
-        // Apply velocity to player
-        //transform.position += To3DVector(delta);
+            // Move our child if we have velocity
+            if (internalVelocity.sqrMagnitude > 0.05f)
+            {
+                childSprite.transform.localPosition += new Vector3(internalVelocity.x, internalVelocity.y, 0f) * Time.deltaTime;
+            }
+        }
     }
 
     private static Vector3 To3DVector(Vector2 vec)

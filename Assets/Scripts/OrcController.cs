@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Weapons;
 
-[RequireComponent(typeof(Animator))]
 [RequireComponent(typeof(Rigidbody2D))]
 public class OrcController : MonoBehaviour
 {
@@ -19,6 +19,9 @@ public class OrcController : MonoBehaviour
     [Header("General Settings")]
     public float Drag;
     public float AIUpdateFreq;
+    public float InternalGravity;
+    public float InternalDrag;
+    public float DamagedBounceHeight;
 
     [Header("Wander Settings")]
     public float WanderDistance;
@@ -47,24 +50,41 @@ public class OrcController : MonoBehaviour
     private float aiUpdateTimer = 0f;
 
     private Vector2 velocity = Vector2.zero;
+    private Vector2 internalVelocity = Vector2.zero;
+    private bool internalRest = true;
 
     private Animator anim;
     private Rigidbody2D rb;
     private Health health;
     private Weapon activeWeapon;
+    private GameObject childSprite;
 
     private PlayerController pController;
 
     public void Start()
     {
-        anim = GetComponent<Animator>();
+        childSprite = transform.GetChild(0)?.gameObject;
+        anim = childSprite.GetComponent<Animator>();
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<Health>();
 
-        activeWeapon = GetComponentInChildren<Weapon>();
+        activeWeapon = childSprite.GetComponentInChildren<Weapon>();
         pController = GameObject.FindWithTag("Player")?.GetComponent<PlayerController>();
 
         aiUpdateDuration = 1f / AIUpdateFreq;
+
+        // Subscribe to our health messages
+        UnityAction healthAction = HealthAction;
+        health.Subscribe(GetInstanceID(), healthAction);
+    }
+
+    public void HealthAction()
+    {
+        Debug.Log(string.Format("Logged a health action on {0}", gameObject.name));
+        Vector2 fromPlayer = (transform.position - pController.transform.position).normalized;
+        internalRest = false;
+        internalVelocity += Vector2.up * Mathf.Sqrt(2f * InternalGravity * DamagedBounceHeight);
+        velocity += fromPlayer * 3f;
     }
 
     public void Update()
@@ -100,6 +120,23 @@ public class OrcController : MonoBehaviour
 
         // Apply velocity
         rb.velocity = velocity;
+
+        // Update internal child velocity
+        if (!internalRest)
+        {
+            internalVelocity *= InternalDrag;
+            internalVelocity += InternalGravity * Vector2.down * Time.deltaTime;
+
+            if (childSprite.transform.localPosition.y <= 0f && Vector3.Dot(internalVelocity, Vector2.down) > 0.707f)
+            {
+                internalVelocity = Vector2.zero;
+                childSprite.transform.localPosition = Vector3.zero;
+                internalRest = true;
+            }
+
+            // Move our child
+            childSprite.transform.localPosition += new Vector3(internalVelocity.x, internalVelocity.y, 0f) * Time.deltaTime;
+        }
     }
 
     private void AnimationUpdate()
@@ -172,7 +209,6 @@ public class OrcController : MonoBehaviour
             // Move towards our target
             velocity += new Vector2(toTarget.x, toTarget.y).normalized * MoveSpeed * Time.deltaTime;
         }
-
     }
 
     private void AIUpdate()

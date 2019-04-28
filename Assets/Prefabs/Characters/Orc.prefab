@@ -139,17 +139,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentState: 0
-  Drag: 0.7
+  Drag: 0.8
+  AIUpdateFreq: 4
   WanderDistance: 5
-  MoveSpeed: 50
+  MoveSpeed: 40
   WanderMinTimer: 2
   WanderMaxTimer: 7
   MaxWanderDistance: 5
   ArrivedDistance: 0.5
-  GiveUpDistance: 15
-  ChaseSpeed: 10
-  SafeDistance: 15
-  FleeSpeed: 10
+  AlertDistance: 5
+  GiveUpChaseDistance: 6
+  ChaseSpeed: 50
+  AttackDistance: 1
+  AttackDistanceTolerance: 0.5
+  SafeDistance: 8
+  FleeSpeed: 60
+  FleeHealth: 4
 --- !u!58 &149399367070464534
 CircleCollider2D:
   m_ObjectHideFlags: 0

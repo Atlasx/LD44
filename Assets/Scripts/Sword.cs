@@ -44,7 +44,7 @@ namespace Weapons
             base.Discard();
         }
 
-        public void OnCollisionEnter2D(Collision2D collision)
+        public void OnTriggerEnter2D(Collider2D collision)
         {
             Debug.Log("Hit Object With Sword");
             // Ignore the player
@@ -58,7 +58,7 @@ namespace Weapons
                 }
                 else
                 {
-                    Debug.Log("Couldn't Find object health");
+                    Debug.Log("Couldn't find object health");
                 }
             }
         }

@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     public float Drag = 0.95f;
     public float SleepSpeed = 0.1f;
     public float MaxMoveSpeed = 5f;
+    public float CrouchMoveSpeed = 30f;
 
     [Header("Control Settings")]
     public KeyCode leftKey = KeyCode.A;
@@ -25,9 +26,12 @@ public class PlayerController : MonoBehaviour
     public KeyCode grabKey = KeyCode.E;
     public KeyCode attackKey = KeyCode.Space;
     public KeyCode discardKey = KeyCode.Q;
+    public KeyCode crouchKey = KeyCode.LeftShift;
 
     [HideInInspector]
     public Vector2 velocity;
+    private float currentMoveSpeed;
+    private bool crouching = false;
 
     public Weapon activeWeapon;
 
@@ -61,7 +65,10 @@ public class PlayerController : MonoBehaviour
         // Update movement parameters
         anim.SetFloat("MoveX", velocity.x);
         anim.SetFloat("MoveY", velocity.y);
-        anim.SetBool("Idle", velocity.sqrMagnitude < SleepSpeed);    
+        anim.SetBool("Idle", velocity.sqrMagnitude < SleepSpeed);
+
+        // Crouching
+        anim.SetBool("Crouch", crouching);   
     }
 
     private void WeaponUpdate()
@@ -115,6 +122,7 @@ public class PlayerController : MonoBehaviour
         Vector2 desiredMove = Vector2.zero;
 
         // Read inputs
+        currentMoveSpeed = MoveSpeed;
 
         // Left
         if (Input.GetKey(leftKey) || Input.GetKey(leftAltKey))
@@ -140,9 +148,17 @@ public class PlayerController : MonoBehaviour
             desiredMove += Vector2.down;
         }
 
+        // Crouch
+        crouching = false;
+        if (Input.GetKey(crouchKey))
+        {
+            currentMoveSpeed = CrouchMoveSpeed;
+            crouching = true;
+        }
+
         //Normalize movement direction
         desiredMove.Normalize();
-        desiredMove *= MoveSpeed;
+        desiredMove *= currentMoveSpeed;
 
         // Update player velocity
         velocity += desiredMove * Time.deltaTime;

@@ -83,6 +83,7 @@ public class Health : MonoBehaviour
         if (RandomStartingHealth)
         {
             MaxHealth = Random.Range(MinStartHealth, MaxStartHealth);
+            MaxHealth -= MaxHealth % 2;
             CurrentHealth = MaxHealth;
         }
 

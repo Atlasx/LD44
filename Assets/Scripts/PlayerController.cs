@@ -67,15 +67,17 @@ public class PlayerController : MonoBehaviour
 
     public void HealthAction()
     {
-        Debug.Log("Logged a health action");
         internalRest = false;
-        internalVelocity += Vector2.up * Mathf.Sqrt(2f * InternalGravity * DamagedBounceHeight);
+        // Don't bounce past our max bounce height
+        float curBounceHeight = DamagedBounceHeight - childSprite.transform.localPosition.y;
+        internalVelocity = Vector2.up * Mathf.Sqrt(2f * InternalGravity * curBounceHeight);
     }
 
     public void Update()
     {
         WeaponUpdate();
         AnimatorUpdate();
+        WeaponFlip();
     }
 
     public void FixedUpdate()
@@ -91,6 +93,38 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void WeaponFlip()
+    {
+        if (Mathf.Abs(velocity.x) > Mathf.Abs(velocity.y))
+        {
+            // Left or Right
+            if (velocity.x < 0f)
+            {
+                // Left
+                activeWeapon.SetOrientation(WeaponOrientation.Left);
+            }
+            else
+            {
+                // Right
+                activeWeapon.SetOrientation(WeaponOrientation.Right);
+            }
+        }
+        else
+        {
+            // Up or Down
+            if (velocity.y < 0f)
+            {
+                //Down
+                activeWeapon.SetOrientation(WeaponOrientation.Left);
+            }
+            else
+            {
+                // Up
+                activeWeapon.SetOrientation(WeaponOrientation.Right);
+            }
+        }
+    }
+
     private void AnimatorUpdate()
     {
         // Update movement parameters
@@ -99,7 +133,7 @@ public class PlayerController : MonoBehaviour
         anim.SetBool("Idle", velocity.sqrMagnitude < SleepSpeed);
 
         // Crouching
-        anim.SetBool("Crouch", crouching);   
+        anim.SetBool("Crouch", crouching); 
     }
 
     private void WeaponUpdate()
@@ -219,6 +253,8 @@ public class PlayerController : MonoBehaviour
                 // only add gravity if we need it
                 internalVelocity += InternalGravity * Vector2.down * Time.deltaTime;
             }
+
+            Vector2.ClampMagnitude(internalVelocity, 10f);
 
             // Move our child if we have velocity
             if (internalVelocity.sqrMagnitude > 0.05f)

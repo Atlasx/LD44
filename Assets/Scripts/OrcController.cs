@@ -80,7 +80,6 @@ public class OrcController : MonoBehaviour
 
     public void HealthAction()
     {
-        Debug.Log(string.Format("Logged a health action on {0}", gameObject.name));
         Vector2 fromPlayer = (transform.position - pController.transform.position).normalized;
         internalRest = false;
         internalVelocity += Vector2.up * Mathf.Sqrt(2f * InternalGravity * DamagedBounceHeight);
@@ -98,6 +97,8 @@ public class OrcController : MonoBehaviour
             // Reset timer
             aiUpdateTimer = 0f;
         }
+
+        WeaponFlip();
     }
 
     public void FixedUpdate()
@@ -136,6 +137,38 @@ public class OrcController : MonoBehaviour
 
             // Move our child
             childSprite.transform.localPosition += new Vector3(internalVelocity.x, internalVelocity.y, 0f) * Time.deltaTime;
+        }
+    }
+
+    private void WeaponFlip()
+    {
+        if (Mathf.Abs(velocity.x) > Mathf.Abs(velocity.y))
+        {
+            // Left or Right
+            if (velocity.x < 0f)
+            {
+                // Left
+                activeWeapon.SetOrientation(WeaponOrientation.Left);
+            }
+            else
+            {
+                // Right
+                activeWeapon.SetOrientation(WeaponOrientation.Right);
+            }
+        }
+        else
+        {
+            // Up or Down
+            if (velocity.y < 0f)
+            {
+                //Down
+                activeWeapon.SetOrientation(WeaponOrientation.Left);
+            }
+            else
+            {
+                // Up
+                activeWeapon.SetOrientation(WeaponOrientation.Right);
+            }
         }
     }
 

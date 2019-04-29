@@ -59,6 +59,9 @@ TextureImporter:
   - first:
       213: -547283182715305120
     second: PlayerCrouch_0
+  - first:
+      213: -5028009318970784729
+    second: PlayerDead_0
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -546,6 +549,27 @@ TextureImporter:
       bones: []
       spriteID: a3d5aa3aab79047169cd48d5b6a9fe9e
       internalID: -547283182715305120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PlayerDead_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 64
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fe3b484f1c2384e46a746bd2a6cd902f
+      internalID: -5028009318970784729
       vertices: []
       indices: 
       edges: []

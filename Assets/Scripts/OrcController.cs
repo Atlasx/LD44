@@ -11,7 +11,8 @@ public class OrcController : MonoBehaviour
     {
         Idle,
         Chase,
-        Flee
+        Flee,
+        Dead
     }
 
     public OrcState currentState = OrcState.Idle;
@@ -74,16 +75,29 @@ public class OrcController : MonoBehaviour
         aiUpdateDuration = 1f / AIUpdateFreq;
 
         // Subscribe to our health messages
-        UnityAction healthAction = HealthAction;
+        UnityAction<HealthEvent> healthAction = HealthAction;
         health.Subscribe(GetInstanceID(), healthAction);
     }
 
-    public void HealthAction()
+    public void HealthAction(HealthEvent hEvent)
     {
         Vector2 fromPlayer = (transform.position - pController.transform.position).normalized;
         internalRest = false;
         internalVelocity += Vector2.up * Mathf.Sqrt(2f * InternalGravity * DamagedBounceHeight);
         velocity += fromPlayer * 3f;
+
+        switch (hEvent)
+        {
+            case HealthEvent.Death:
+                currentState = OrcState.Dead;
+                anim.SetBool("Dead", true);
+                rb.mass = 0.1f;
+                break;
+            case HealthEvent.Hurt:
+
+                break;
+        }
+
     }
 
     public void Update()

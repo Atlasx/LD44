@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+public enum HealthEvent
+{
+    Hurt,
+    Death,
+    Heal
+}
+
 public class Health : MonoBehaviour
 {
     public int CurrentHealth;
@@ -26,9 +33,9 @@ public class Health : MonoBehaviour
 
     private float invcTimer = 0f;
 
-    private Dictionary<int, UnityAction> listeners = new Dictionary<int, UnityAction>();
+    private Dictionary<int, UnityAction<HealthEvent>> listeners = new Dictionary<int, UnityAction<HealthEvent>>();
 
-    public void Subscribe(int id, UnityAction callback)
+    public void Subscribe(int id, UnityAction<HealthEvent> callback)
     {
         listeners.Add(id, callback);
     }
@@ -59,9 +66,9 @@ public class Health : MonoBehaviour
             SpawnBlood();
 
             // Send message to listeners
-            foreach (UnityAction ac in listeners.Values)
+            foreach (UnityAction<HealthEvent> ac in listeners.Values)
             {
-                ac.Invoke();
+                ac.Invoke(HealthEvent.Hurt);
             }
         }
     }
@@ -86,7 +93,11 @@ public class Health : MonoBehaviour
     // Kills the entity
     public void Kill()
     {
-
+        // Send message
+        foreach(UnityAction<HealthEvent> he in listeners.Values)
+        {
+            he.Invoke(HealthEvent.Death);
+        }
     }
 
     public void Start()

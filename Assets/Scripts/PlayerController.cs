@@ -8,7 +8,14 @@ using Weapons;
 [RequireComponent (typeof(Collider2D))]
 public class PlayerController : MonoBehaviour
 {
+    public enum PlayerState
+    {
+        Alive,
+        Dead
+    }
+
     public bool DebugMovement = false;
+    public PlayerState CurrentState = PlayerState.Alive;
 
     [Header("Component References")]
     public Animator anim;
@@ -61,28 +68,61 @@ public class PlayerController : MonoBehaviour
         childSprite = transform.GetChild(0)?.gameObject;
 
         // Subscribe to our health messages
-        UnityAction healthAction = HealthAction;
+        UnityAction<HealthEvent> healthAction = HealthAction;
         pHealth.Subscribe(GetInstanceID(), healthAction);
+
+        // Make sure we're alive
+        CurrentState = PlayerState.Alive;
     }
 
-    public void HealthAction()
+    public void HealthAction(HealthEvent hEvent)
     {
-        internalRest = false;
-        // Don't bounce past our max bounce height
-        float curBounceHeight = DamagedBounceHeight - childSprite.transform.localPosition.y;
-        internalVelocity = Vector2.up * Mathf.Sqrt(2f * InternalGravity * curBounceHeight);
+        switch (hEvent)
+        {
+            case HealthEvent.Hurt:
+                internalRest = false;
+                // Don't bounce past our max bounce height
+                float curBounceHeight = DamagedBounceHeight - childSprite.transform.localPosition.y;
+                internalVelocity = Vector2.up * Mathf.Sqrt(2f * InternalGravity * curBounceHeight);
+                break;
+            case HealthEvent.Death:
+                anim.SetBool("Dead", true);
+                CurrentState = PlayerState.Dead;
+                break;
+            case HealthEvent.Heal:
+
+                break;
+        }
     }
 
     public void Update()
     {
-        WeaponUpdate();
-        AnimatorUpdate();
-        WeaponFlip();
+        switch (CurrentState)
+        {
+            case PlayerState.Alive:
+                WeaponUpdate();
+                AnimatorUpdate();
+                WeaponFlip();
+                break;
+            case PlayerState.Dead:
+                // Do nothing for now
+                break;
+        }
     }
 
     public void FixedUpdate()
     {
-        MovementUpdate();
+        switch (CurrentState)
+        {
+            case PlayerState.Alive:
+                MovementUpdate();
+                break;
+            case PlayerState.Dead:
+                // Do nothing for now
+                velocity *= Drag;
+                rb.velocity = velocity;
+                break;
+        }
     }
 
     private void OnDrawGizmos()
@@ -141,8 +181,6 @@ public class PlayerController : MonoBehaviour
         // Grabbing weapons
         if (Input.GetKeyDown(grabKey))
         {
-            Debug.Log("Attempt to grab closest weapon");
-
             List<GameObject> weaponList = ItemManager.Instance.weaponItems;
             int nearestIndex = -1;
             float nearestSqrDist = float.MaxValue;

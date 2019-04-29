@@ -56,6 +56,9 @@ TextureImporter:
   - first:
       213: 3913753300373695406
     second: OrcMoveDown_4
+  - first:
+      213: 4141801916996556100
+    second: OrcDead_0
   externalObjects: {}
   serializedVersion: 10
   mipmaps:
@@ -522,6 +525,27 @@ TextureImporter:
       bones: []
       spriteID: cde312555821649c89bbd040c599f569
       internalID: 3913753300373695406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: OrcDead_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 96
+        width: 32
+        height: 32
+      alignment: 7
+      pivot: {x: 0.5, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98bdaa2d39f1148079cd137d62aba838
+      internalID: 4141801916996556100
       vertices: []
       indices: 
       edges: []

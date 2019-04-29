@@ -74,14 +74,10 @@ namespace Weapons
             if (!IsColliderParent(collision))
             {
                 GameObject other = collision.gameObject;
-                Health otherHealth = other.GetComponent<Health>();
+                Health otherHealth = other.GetComponent<Hitbox>()?.owner.GetComponent<Health>();
                 if (otherHealth != null)
                 {
                     otherHealth.Harm(damageDealt);
-                }
-                else
-                {
-                    Debug.Log("Couldn't find object health");
                 }
             }
         }

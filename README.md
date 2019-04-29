@@ -1,3 +1,5 @@
 # LD44
 
-Readme, maybe a log here later
+Play it here on Itch.io
+
+https://dustyatlas.itch.io/ld44-your-life-is-currency
